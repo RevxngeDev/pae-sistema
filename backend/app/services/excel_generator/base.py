@@ -98,16 +98,29 @@ class ExcelGeneratorBase:
     def _insert_photos(self, wb: Workbook, form_data: dict):
         """
         Insert photos into photographic record sheets.
-        This logic is special because photo sheets don't use
-        standard cell mapping.
         """
         from openpyxl.drawing.image import Image as XLImage
         from pathlib import Path
         
-        # Photo sheets and their data keys
         photo_sheets = [
             ("REGISTRO FOTOG GENERAL", "fotos_general"),
             ("REGISTRO FOTOGRÁFICO HALLAZGOS", "fotos_hallazgos"),
+        ]
+        
+        # 12 photo positions: (photo_cell, description_cell, width, height)
+        positions = [
+            ("A7", "A25", 200, 150),     # Photo 1
+            ("C7", "C25", 200, 150),     # Photo 2
+            ("A30", "A48", 200, 150),    # Photo 3
+            ("C30", "C48", 200, 150),    # Photo 4
+            ("A53", "A71", 200, 150),    # Photo 5
+            ("C53", "C71", 200, 150),    # Photo 6
+            ("A76", "A94", 200, 150),    # Photo 7
+            ("C76", "C94", 200, 150),    # Photo 8
+            ("A99", "A117", 200, 150),   # Photo 9
+            ("C99", "C117", 200, 150),   # Photo 10
+            ("A122", "A140", 200, 150),  # Photo 11
+            ("C122", "C140", 200, 150),  # Photo 12
         ]
         
         for sheet_name, data_key in photo_sheets:
@@ -120,22 +133,16 @@ class ExcelGeneratorBase:
             
             ws = wb[sheet_name]
             
-            # 1. Fill A5 cell with concatenated info
+            # Fill A5 with concatenated info
             site = data.get("sede_educativa", "")
             date = data.get("fecha", "")
             period = data.get("periodo", "")
             info_text = f"Sede educativa: {site}     Fecha: {date}     Período: {period}"
             ws["A5"] = info_text
             
-            # 2. Insert photos and descriptions
-            # Positions: [(photo_cell, description_cell, width, height), ...]
-            positions = [
-                ("A7", "A25", 200, 150),   # Photo 1
-                ("C7", "C25", 200, 150),   # Photo 2
-            ]
-            
+            # Insert all 12 photos and descriptions
             for idx, (photo_cell, desc_cell, width, height) in enumerate(positions, 1):
-                # Get image path
+                # Insert photo if exists
                 photo_path = data.get(f"foto_{idx}")
                 if photo_path and Path(photo_path).exists():
                     img = XLImage(photo_path)
@@ -143,7 +150,7 @@ class ExcelGeneratorBase:
                     img.height = height
                     ws.add_image(img, photo_cell)
                 
-                # Write description
+                # Write description if exists
                 description = data.get(f"descripcion_{idx}", "")
                 if description:
                     ws[desc_cell] = f"Descripción F{idx}: {description}"
