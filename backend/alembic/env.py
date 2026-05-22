@@ -12,7 +12,7 @@ from app.core.config import settings
 from app.core.database import Base
 
 # Importar TODOS los modelos para que Alembic los detecte
-from app.models import User, Inspector, Plantilla  # noqa: F401
+from app.models import User, Inspector, Template  # noqa: F401
 
 
 # Configuración de Alembic
