@@ -1,0 +1,104 @@
+{
+  "tipo": "RI",
+  "template_file": "ri_template.xlsx",
+  "sheets": {
+    "REQUERIMIENTOS NUTRICIONALES": {
+      "info_general": {
+        "fecha_visita": "J8",
+        "sede_educativa": "X8",
+        "num_servicios": "AA10",
+        "atiende_nombre": "H12",
+        "atiende_cargo": "AD12",
+        "realiza_nombre": "H13",
+        "realiza_cargo": "AD13"
+      },
+      "visita": {
+        "opcion_1ra": "AA9",
+        "opcion_2da": "AE9",
+        "opcion_3ra": "AJ9"
+      },
+      "menu": {
+        "descripcion_menu": "I15",
+        "intercambio_alimento": "L18",
+        "intercambio_motivo": "L19",
+        "intercambio_fecha": "AA19",
+        "intercambio_autorizado_por": "AJ19"
+      },
+      "calificaciones": {
+        "item_1": "AK23",
+        "item_2": "AK24",
+        "item_3": "AK25",
+        "item_4": "AK26",
+        "item_5": "AK27",
+        "item_6": "AK28",
+        "item_7": "AK29",
+        "item_8": "AK30",
+        "item_9": "AK31",
+        "item_10": "AK32",
+        "item_11": "AK33"
+      },
+      "observaciones": {
+        "texto": "A35"
+      },
+      "firmas": {
+        "firma1_nombre": "O47",
+        "firma1_documento": "O48",
+        "firma1_cargo": "O49",
+        "firma2_nombre": "AA47",
+        "firma2_documento": "AA48",
+        "firma2_cargo": "AA49"
+      }
+    },
+    "DESPACHO Y SUMINISTRO": {
+      "info_general_despacho": {
+        "fecha_visita": "J6",
+        "jornada_manana": "X7",
+        "jornada_tarde": "AA7",
+        "sede_educativa": "H9",
+        "acceso_facil": "AG9",
+        "acceso_dificil": "AL9",
+        "nombre_operador": "H10",
+        "num_contrato": "X10",
+        "tipo_vehiculo": "AH10",
+        "nombre_conductor": "H11",
+        "documento_conductor": "X11",
+        "placa_vehiculo": "AH11",
+        "atiende_nombre": "H12",
+        "atiende_cargo": "AD12",
+        "realiza_nombre": "H13",
+        "realiza_cargo": "AD13"
+      },
+      "calificaciones_despacho": {
+        "item_1": "Q17",
+        "item_2": "AK17",
+        "item_3": "Q20",
+        "item_4": "AK20",
+        "item_5": "Q21",
+        "item_6": "AK21",
+        "item_7": "Q22",
+        "item_8": "AK22",
+        "item_9": "Q23",
+        "item_10": "AK23",
+        "item_11": "Q24",
+        "item_12": "AK24",
+        "item_13": "Q25",
+        "item_14": "AK25",
+        "item_15": "Q26",
+        "item_16": "AK26",
+        "item_17": "Q27",
+        "item_18": "AK27"
+      },
+      "observaciones_despacho": {
+        "texto": "A38"
+      },
+      "firmas_despacho": {
+        "firma1_nombre": "O47",
+        "firma1_documento": "O48",
+        "firma1_cargo": "O49",
+        "firma2_nombre": "AA47",
+        "firma2_documento": "AA48",
+        "firma2_cargo": "AA49"
+      }
+    }
+  }
+}
