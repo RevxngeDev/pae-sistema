@@ -1,7 +1,7 @@
 """
-Generador base de planillas Excel.
-Carga un template y rellena celdas según un mapeo JSON.
-openpyxl preserva imágenes automáticamente.
+Base Excel generator for filling templates.
+Loads a template and fills cells according to a JSON mapping.
+Preserves images and formatting automatically with openpyxl + Pillow.
 """
 import json
 from pathlib import Path
@@ -12,7 +12,7 @@ from openpyxl import load_workbook
 from openpyxl.workbook import Workbook
 
 
-# Directorios base
+# Base directories
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # → app/
 TEMPLATES_DIR = BASE_DIR / "templates_xlsx"
 MAPPING_DIR = Path(__file__).resolve().parent / "mapping"
@@ -20,8 +20,8 @@ MAPPING_DIR = Path(__file__).resolve().parent / "mapping"
 
 class ExcelGeneratorBase:
     """
-    Generador base de Excel.
-    Las subclases solo definen `mapping_file`.
+    Base Excel generator.
+    Subclasses only need to define `mapping_file`.
     """
 
     mapping_file: str = ""
@@ -32,38 +32,39 @@ class ExcelGeneratorBase:
 
         if not self.template_path.exists():
             raise FileNotFoundError(
-                f"Template no encontrado: {self.template_path}"
+                f"Template not found: {self.template_path}"
             )
 
     def _load_mapping(self) -> dict:
-        """Carga el archivo JSON de mapeo."""
+        """Load the JSON mapping file."""
         mapping_path = MAPPING_DIR / self.mapping_file
         if not mapping_path.exists():
-            raise FileNotFoundError(f"Mapping no encontrado: {mapping_path}")
+            raise FileNotFoundError(f"Mapping not found: {mapping_path}")
 
         with open(mapping_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def generar(self, form_data: dict) -> BytesIO:
+    def generate(self, form_data: dict) -> BytesIO:
         """
-        Genera el Excel con los datos del formulario.
+        Generate the Excel file with form data.
 
         Args:
-            form_data: diccionario con la data del formulario
+            form_data: dictionary with form data
 
         Returns:
-            BytesIO con el contenido del archivo Excel
+            BytesIO with Excel file content
         """
         wb = load_workbook(self.template_path)
-        self._rellenar_hojas(wb, form_data)
+        self._fill_sheets(wb, form_data)
+        self._insert_photos(wb, form_data)
 
         output = BytesIO()
         wb.save(output)
         output.seek(0)
         return output
 
-    def _rellenar_hojas(self, wb: Workbook, form_data: dict):
-        """Recorre todas las hojas del mapeo y rellena celdas."""
+    def _fill_sheets(self, wb: Workbook, form_data: dict):
+        """Iterate through all mapped sheets and fill cells."""
         for sheet_name, sections in self.mapping["sheets"].items():
             if sheet_name not in wb.sheetnames:
                 continue
@@ -77,17 +78,72 @@ class ExcelGeneratorBase:
                         self._write_cell(ws, cell_ref, value)
 
     def _write_cell(self, ws, cell_ref: str, value: Any):
-        """Escribe en una celda. En celdas combinadas basta la superior izquierda."""
+        """
+        Write to a cell, handling merged cells.
+        For merged cells, write to the top-left cell of the range.
+        """
         try:
             ws[cell_ref] = value
-        except AttributeError as e:
-            # La celda es parte de un rango combinado pero no es la esquina superior izquierda
-            print(f"⚠️  No se pudo escribir en {cell_ref} (celda combinada): {value}")
-            # Intentar encontrar la celda raíz del merge
+        except AttributeError:
+            # Cell is part of a merged range but not the top-left corner
+            print(f"⚠️  Cannot write to {cell_ref} (merged cell): {value}")
+            # Find the root cell of the merge
             for merged_range in ws.merged_cells.ranges:
                 if cell_ref in merged_range:
-                    # Escribir en la celda superior izquierda del rango
                     top_left = merged_range.start_cell
-                    print(f"   Usando en su lugar: {top_left.coordinate}")
+                    print(f"   Using instead: {top_left.coordinate}")
                     top_left.value = value
                     break
+
+    def _insert_photos(self, wb: Workbook, form_data: dict):
+        """
+        Insert photos into photographic record sheets.
+        This logic is special because photo sheets don't use
+        standard cell mapping.
+        """
+        from openpyxl.drawing.image import Image as XLImage
+        from pathlib import Path
+        
+        # Photo sheets and their data keys
+        photo_sheets = [
+            ("REGISTRO FOTOG GENERAL", "fotos_general"),
+            ("REGISTRO FOTOGRÁFICO HALLAZGOS", "fotos_hallazgos"),
+        ]
+        
+        for sheet_name, data_key in photo_sheets:
+            if sheet_name not in wb.sheetnames:
+                continue
+            
+            data = form_data.get(data_key)
+            if not data:
+                continue
+            
+            ws = wb[sheet_name]
+            
+            # 1. Fill A5 cell with concatenated info
+            site = data.get("sede_educativa", "")
+            date = data.get("fecha", "")
+            period = data.get("periodo", "")
+            info_text = f"Sede educativa: {site}     Fecha: {date}     Período: {period}"
+            ws["A5"] = info_text
+            
+            # 2. Insert photos and descriptions
+            # Positions: [(photo_cell, description_cell, width, height), ...]
+            positions = [
+                ("A7", "A25", 200, 150),   # Photo 1
+                ("C7", "C25", 200, 150),   # Photo 2
+            ]
+            
+            for idx, (photo_cell, desc_cell, width, height) in enumerate(positions, 1):
+                # Get image path
+                photo_path = data.get(f"foto_{idx}")
+                if photo_path and Path(photo_path).exists():
+                    img = XLImage(photo_path)
+                    img.width = width
+                    img.height = height
+                    ws.add_image(img, photo_cell)
+                
+                # Write description
+                description = data.get(f"descripcion_{idx}", "")
+                if description:
+                    ws[desc_cell] = f"Descripción F{idx}: {description}"
