@@ -107,3 +107,64 @@ def list_templates(
         query = query.filter(Template.inspector_id == inspector_id)
     
     return query.order_by(Template.created_at.desc()).offset(skip).limit(limit).all()
+
+def create_cct_template(
+    db: Session,
+    inspector_id: UUID,
+    data,
+) -> tuple:
+    """
+    Create a new CCT template.
+    
+    Returns:
+        tuple: (Template model instance, Excel file as BytesIO)
+    """
+    from app.services.excel_generator import CCTGenerator
+    
+    # Verify inspector exists and is active
+    inspector = db.query(Inspector).filter(
+        Inspector.id == inspector_id,
+        Inspector.is_active == True  # noqa: E712
+    ).first()
+    
+    if not inspector:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inspector not found or inactive",
+        )
+    
+    # Generate Excel file
+    generator = CCTGenerator()
+    form_data = data.model_dump()
+    excel_bytes = generator.generate(form_data)
+    
+    # Extract key fields for search
+    educational_site = form_data.get("info_general", {}).get("sede_educativa")
+    visit_date_str = form_data.get("info_general", {}).get("fecha_visita")
+    visit_date = None
+    if visit_date_str:
+        try:
+            visit_date = datetime.strptime(visit_date_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            pass
+    
+    # Generate file name
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_name = f"CCT_{inspector.codigo}_{timestamp}.xlsx"
+    
+    # Create database record
+    template = Template(
+        template_type="CCT",
+        inspector_id=inspector_id,
+        form_data=form_data,
+        file_name=file_name,
+        status="pending",
+        educational_site=educational_site,
+        visit_date=visit_date,
+    )
+    
+    db.add(template)
+    db.commit()
+    db.refresh(template)
+    
+    return template, excel_bytes
