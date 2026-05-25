@@ -49,7 +49,8 @@ export default function CodeValidationPage() {
   };
 
   const handleContinue = () => {
-    router.push(`/inspector/form?tipo=${templateType}&codigo=${code.trim()}`);
+    const formRoute = templateType === 'CCT' ? 'form-cct' : 'form';
+    router.push(`/inspector/${formRoute}?tipo=${templateType}&codigo=${code.trim()}`);
   };
 
   return (

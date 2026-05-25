@@ -98,14 +98,16 @@ class ExcelGeneratorBase:
     def _insert_photos(self, wb: Workbook, form_data: dict):
         """
         Insert photos into photographic record sheets.
+        Reads photo sheet names from the JSON mapping for flexibility.
         """
         from openpyxl.drawing.image import Image as XLImage
         from pathlib import Path
         
-        photo_sheets = [
-            ("REGISTRO FOTOG GENERAL", "fotos_general"),
-            ("REGISTRO FOTOGRÁFICO HALLAZGOS", "fotos_hallazgos"),
-        ]
+        # Get photo sheets from mapping (defaults to RI sheet names if not defined)
+        photo_sheets = self.mapping.get("photo_sheets", [
+            ["REGISTRO FOTOGRÁFICO", "fotos_general"],
+            ["REGISTRO FOTOGRÁFICO HALLAZGOS", "fotos_hallazgos"],
+        ])
         
         # 12 photo positions: (photo_cell, description_cell, width, height)
         positions = [
@@ -142,7 +144,6 @@ class ExcelGeneratorBase:
             
             # Insert all 12 photos and descriptions
             for idx, (photo_cell, desc_cell, width, height) in enumerate(positions, 1):
-                # Insert photo if exists
                 photo_path = data.get(f"foto_{idx}")
                 if photo_path and Path(photo_path).exists():
                     img = XLImage(photo_path)
@@ -150,7 +151,6 @@ class ExcelGeneratorBase:
                     img.height = height
                     ws.add_image(img, photo_cell)
                 
-                # Write description if exists
                 description = data.get(f"descripcion_{idx}", "")
                 if description:
                     ws[desc_cell] = f"Descripción F{idx}: {description}"

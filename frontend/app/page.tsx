@@ -32,16 +32,18 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow opacity-50">
+          <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
-              <FileText className="w-12 h-12 text-gray-400 mb-2" />
+              <FileText className="w-12 h-12 text-blue-600 mb-2" />
               <CardTitle>CCT - Complementos</CardTitle>
               <CardDescription>
-                Formulario de complementos alimentarios (Próximamente)
+                Formulario de complementos alimentarios calientes transportados
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" disabled>Próximamente</Button>
+              <Link href="/inspector/code?tipo=CCT">
+                <Button className="w-full">Llenar planilla CCT</Button>
+              </Link>
             </CardContent>
           </Card>
 
