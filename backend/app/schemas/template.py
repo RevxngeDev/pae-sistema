@@ -140,3 +140,63 @@ class TemplateCCTCreate(BaseModel):
     # Sheets 5-6: Photos (reusing same structure as RI)
     fotos_general: Optional[Dict[str, Any]] = Field(None, description="General photos")
     fotos_hallazgos: Optional[Dict[str, Any]] = Field(None, description="Findings photos")
+    
+# ========================================
+# RPS schemas
+# ========================================
+
+class TemplateRPSCreate(BaseModel):
+    """Data to generate an RPS template."""
+    
+    # Sheet 1: ALIM Y NUTRI RPS
+    info_general: Dict[str, Any] = Field(..., description="General info")
+    menu: Dict[str, Any] = Field(default_factory=dict, description="Menu")
+    intercambios: Dict[str, Any] = Field(default_factory=dict, description="Food exchanges")
+    calificaciones: Dict[str, Any] = Field(default_factory=dict, description="Quality ratings")
+    observaciones: Dict[str, Any] = Field(default_factory=dict, description="Observations")
+    firmas: Dict[str, Any] = Field(..., description="Signatures")
+    
+    # Sheet 2: MATERIA PRIMA RPS
+    info_general_mp: Dict[str, Any] = Field(..., description="MP general info")
+    menu_mp_dia1: Dict[str, Any] = Field(default_factory=dict, description="Day 1 menu")
+    materia_prima_dia1: Dict[str, Any] = Field(default_factory=dict, description="Day 1 raw materials")
+    menu_mp_dia2: Dict[str, Any] = Field(default_factory=dict, description="Day 2 menu")
+    materia_prima_dia2: Dict[str, Any] = Field(default_factory=dict, description="Day 2 raw materials")
+    observaciones_mp: Dict[str, Any] = Field(default_factory=dict, description="MP observations")
+    firmas_mp: Dict[str, Any] = Field(..., description="MP signatures")
+    
+    # Sheet 3: TEMPERAURAS Y ORGANOL (typo intentional, matches template)
+    info_general_temp: Dict[str, Any] = Field(..., description="Temp general info")
+    preparaciones: Dict[str, Any] = Field(default_factory=dict, description="Preparations")
+    indicador_temp: Dict[str, Any] = Field(default_factory=dict, description="Compliance indicator")
+    observaciones_temp: Dict[str, Any] = Field(default_factory=dict, description="Observations")
+    firmas_temp: Dict[str, Any] = Field(..., description="Temp signatures")
+    
+    # Sheet 4: CONDICIONES DE OPERACIÓN
+    info_general_cond: Dict[str, Any] = Field(..., description="Conditions general info")
+    calif_edificaciones: Dict[str, Any] = Field(default_factory=dict, description="Buildings ratings")
+    calif_limpieza: Dict[str, Any] = Field(default_factory=dict, description="Cleaning ratings")
+    calif_plagas: Dict[str, Any] = Field(default_factory=dict, description="Pest control ratings")
+    calif_residuos: Dict[str, Any] = Field(default_factory=dict, description="Waste management ratings")
+    calif_agua: Dict[str, Any] = Field(default_factory=dict, description="Water supply ratings")
+    calif_personal: Dict[str, Any] = Field(default_factory=dict, description="Personnel ratings")
+    calif_distribucion: Dict[str, Any] = Field(default_factory=dict, description="Distribution ratings")
+    calif_almacenamiento: Dict[str, Any] = Field(default_factory=dict, description="Storage ratings")
+    calif_preparacion: Dict[str, Any] = Field(default_factory=dict, description="Preparation ratings")
+    calif_calidad: Dict[str, Any] = Field(default_factory=dict, description="Quality assurance ratings")
+    observaciones_generales_cond: Dict[str, Any] = Field(default_factory=dict, description="General observations")
+    firmas_cond: Dict[str, Any] = Field(..., description="Conditions signatures")
+    
+    # Sheet 5: GRAMAJES RPS
+    info_general_gramajes: Dict[str, Any] = Field(..., description="Gramajes general info")
+    instrumento: Dict[str, Any] = Field(default_factory=dict, description="Measurement instrument")
+    intercambios_gramajes: Dict[str, Any] = Field(default_factory=dict, description="Exchange info")
+    alimentos_programados: Dict[str, Any] = Field(default_factory=dict, description="Programmed foods")
+    alimentos_verificados: Dict[str, Any] = Field(default_factory=dict, description="Verified foods")
+    gramajes_tabla: Dict[str, Any] = Field(default_factory=dict, description="Gramajes table")
+    observaciones_gramajes: Dict[str, Any] = Field(default_factory=dict, description="Observations")
+    cambios_menu: Dict[str, Any] = Field(default_factory=dict, description="Menu changes")
+    
+    # Sheets 6-7: Photos
+    fotos_general: Optional[Dict[str, Any]] = Field(None, description="General photos")
+    fotos_hallazgos: Optional[Dict[str, Any]] = Field(None, description="Findings photos")    
